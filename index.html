@@ -1,0 +1,191 @@
+`<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Happy Girlfriend's Day</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Pacifico&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- Ambient floating hearts + notes, running behind every screen -->
+<div id="ambient-hearts" aria-hidden="true"></div>
+
+<!-- Background music (single instance, lives outside the screen system so it
+     never gets re-created or restarted when screens change) -->
+<audio id="bg-audio" src="assets/audio/Keyshia Cole - Love (Audio).mp3" loop preload="auto"></audio>
+
+<!-- Floating music widget -->
+<div id="music-widget" class="music-widget">
+  <button id="music-toggle" class="music-toggle" aria-label="Play or pause music">⏸</button>
+  <div class="music-info">
+    <span class="music-eyebrow">🎵 Now Playing</span>
+    <span class="music-track">Love – Keyshia Cole</span>
+  </div>
+</div>
+
+<!-- "Because this song reminds me of you" card, appears shortly after music starts -->
+<div id="song-note" class="song-note">Because this song reminds me of you ❤️</div>
+
+<!-- Reusable toast for notifications / achievements -->
+<div id="toast" class="toast"></div>
+
+<!-- Reusable loading overlay shown briefly during screen transitions -->
+<div id="loading-overlay" class="loading-overlay">
+  <div class="loading-heart">❤️</div>
+  <p class="loading-text" id="loading-text">Loading memories...</p>
+</div>
+
+<main id="app">
+
+  <!-- ================= SPLASH ================= -->
+  <section id="screen-splash" class="screen screen--active">
+    <div class="pulse-heart" id="pulse-heart">❤️</div>
+    <p class="fade-line" id="splash-line-1">Made with love.</p>
+    <p class="fade-line" id="splash-line-2">Especially for you.</p>
+    <button class="btn btn--primary fade-line" id="btn-start">Start ❤️</button>
+  </section>
+
+  <!-- ================= WELCOME ================= -->
+  <section id="screen-welcome" class="screen">
+    <div class="card card--wide tilt-card">
+      <p class="pov-caption">POV: You accidentally became my favorite person.</p>
+      <h1 class="display">Hi Beautiful ❤️</h1>
+      <p class="body-text">
+        I wanted to give you something that wasn't bought...<br>
+        I wanted to build something.<br><br>
+        So... welcome to your little adventure.
+      </p>
+      <button class="btn btn--primary btn--bounce" data-next>Continue →</button>
+    </div>
+  </section>
+
+  <!-- ================= VERIFICATION ================= -->
+  <section id="screen-verify" class="screen">
+    <div class="card tilt-card" id="verify-card">
+      <p class="eyebrow">Girlfriend Verification 💖</p>
+      <h2 class="verify-question" id="verify-question">Are you Joan?</h2>
+      <div class="verify-options" id="verify-options">
+        <button class="btn btn--soft btn--bounce" data-verify>Yes ❤️</button>
+        <button class="btn btn--soft btn--bounce" data-verify>Absolutely ❤️</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= DASHBOARD ================= -->
+  <section id="screen-dashboard" class="screen">
+    <div class="dash-wrap">
+      <p class="pov-caption pov-caption--center">Breaking News: Brave is still obsessed.</p>
+      <p class="eyebrow eyebrow--center">What makes us special</p>
+      <h2 class="display display--center">Love Dashboard</h2>
+      <div class="dash-grid">
+        <div class="dash-card tilt-card"><span class="dash-label">Relationship Status</span><span class="dash-value">❤️ Taken</span></div>
+        <div class="dash-card tilt-card"><span class="dash-label">Boyfriend</span><span class="dash-value">Brave</span></div>
+        <div class="dash-card tilt-card"><span class="dash-label">Girlfriend</span><span class="dash-value">Joan</span></div>
+        <div class="dash-card tilt-card"><span class="dash-label">Cuteness</span><span class="dash-value">∞</span></div>
+        <div class="dash-card tilt-card"><span class="dash-label">Distance</span><span class="dash-value">Temporary</span></div>
+        <div class="dash-card tilt-card"><span class="dash-label">Love</span><span class="dash-value">Forever</span></div>
+      </div>
+      <button class="btn btn--primary btn--bounce" data-next>Continue →</button>
+    </div>
+  </section>
+
+  <!-- ================= MEMORIES ================= -->
+  <section id="screen-memories" class="screen">
+    <div class="memories-wrap">
+      <p class="eyebrow eyebrow--center">What we've shared</p>
+      <h2 class="display display--center">Memories</h2>
+
+      <!-- TODO(Brave): swap placeholder images in assets/images/ and rewrite captions -->
+      <div class="memory-card tilt-card" id="memory-card">
+        <p class="memory-pov" id="memory-pov"></p>
+        <div class="memory-photo" id="memory-photo">📸</div>
+        <p class="memory-caption" id="memory-caption">One of my favourite days ❤️</p>
+
+        <div class="memory-actions">
+          <button class="memory-action" id="memory-like" data-action="like">
+            <span id="memory-like-icon">🤍</span> <span id="memory-like-count">0</span>
+          </button>
+          <button class="memory-action" id="memory-comment" data-action="comment">💬 Comment</button>
+          <button class="memory-action" id="memory-share" data-action="share">↗ Share</button>
+        </div>
+        <p class="memory-hidden-message" id="memory-hidden-message"></p>
+      </div>
+      <div class="memory-nav">
+        <button class="btn btn--ghost" id="memory-prev">← Back</button>
+        <span class="memory-counter" id="memory-counter">1 / 5</span>
+        <button class="btn btn--ghost" id="memory-next">Next →</button>
+      </div>
+      <button class="btn btn--primary btn--bounce" data-next>Continue →</button>
+    </div>
+  </section>
+
+  <!-- ================= MINI GAME ================= -->
+  <section id="screen-game" class="screen">
+    <div class="game-wrap">
+      <p class="eyebrow eyebrow--center">Let's laugh</p>
+      <h2 class="display display--center">Catch the Hearts</h2>
+      <p class="body-text body-text--center">Collect 10 hearts to unlock the next surprise.</p>
+      <div class="game-score">Collected: <span id="game-score">0</span> / 10</div>
+      <div class="game-field" id="game-field"></div>
+      <button class="btn btn--primary btn--bounce" id="btn-game-continue" data-next disabled>Continue →</button>
+    </div>
+  </section>
+
+  <!-- ================= REASONS ================= -->
+  <section id="screen-reasons" class="screen">
+    <div class="card card--center tilt-card">
+      <p class="eyebrow">Reason <span id="reason-number">#1</span></p>
+      <h2 class="reason-text" id="reason-text">You make ordinary days feel special.</h2>
+      <button class="btn btn--soft btn--bounce" id="btn-another-reason">Tell me another ❤️</button>
+      <button class="btn btn--primary btn--bounce" data-next>Continue →</button>
+    </div>
+  </section>
+
+  <!-- ================= LETTER ================= -->
+  <section id="screen-letter" class="screen screen--letter">
+    <div class="letter-wrap">
+      <!-- TODO(Brave): replace with your real letter -->
+      <p class="letter-text" id="letter-text"></p>
+      <button class="btn btn--primary btn--bounce fade-in-late" id="btn-letter-continue" data-next>Continue →</button>
+    </div>
+  </section>
+
+  <!-- ================= ENDING (Wrapped-style) ================= -->
+  <section id="screen-ending" class="screen">
+    <canvas id="confetti-canvas"></canvas>
+    <div class="ending-content">
+      <p class="eyebrow eyebrow--center">Your Girlfriend's Day, Wrapped</p>
+      <h1 class="display display--huge">Happy International<br>Girlfriend's Day ❤️</h1>
+
+      <div class="mission-card tilt-card">
+        <p class="eyebrow eyebrow--center">Mission Objectives</p>
+        <ul class="mission-list" id="mission-list">
+          <li data-check>Steal my heart</li>
+          <li data-check>Make me smile</li>
+          <li data-check>Become my best friend</li>
+          <li data-check>Become my future wife</li>
+        </ul>
+      </div>
+
+      <div class="wrapped-card tilt-card">
+        <div class="wrapped-row"><span>❤️</span><span>1 heart stolen</span></div>
+        <div class="wrapped-row"><span>😊</span><span>999 smiles created</span></div>
+        <div class="wrapped-row"><span>📸</span><span id="wrapped-memory-count">5 beautiful memories</span></div>
+        <div class="wrapped-row"><span>🎵</span><span>Best soundtrack</span></div>
+        <div class="wrapped-row"><span>👑</span><span>Girlfriend of the Year</span></div>
+      </div>
+
+      <p class="mission-complete">Mission Complete ❤️</p>
+      <p class="body-text body-text--center" id="ending-thanks">Happy Girlfriend's Day, Joan ❤️</p>
+      <p class="signature">Love,<br>Brave ❤️</p>
+    </div>
+  </section>
+
+</main>
+
+<script src="script.js"></script>
+</body>
+</html>
